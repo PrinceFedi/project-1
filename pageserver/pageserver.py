@@ -83,7 +83,13 @@ STATUS_NOT_IMPLEMENTED = "HTTP/1.0 401 Not Implemented\n\n"
 def respond(sock, dockroot):
     """
     This server responds only to GET requests (not PUT, POST, or UPDATE).
-    Any valid GET request is answered with an ascii graphic of a cat.
+    Any valid GET request is answered with the rendering of a html and css file
+    that displays a Green webpage with red font.
+
+    Args:
+        sock: A server socket, responds with transmission when request is received
+        dockroot: DOCKROOT key from Credential.ini, store our specified parent directory
+
     """
     sent = 0
     request = sock.recv(1024)  # We accept only short requests

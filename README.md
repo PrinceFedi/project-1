@@ -24,17 +24,36 @@ The goal of this project is to implement a "file checking" logic for the existin
 
 * You will submit your credentials.ini in Canvas. It should include your name and repo URL.
 
+## Details
 
-## Grading Rubric
+##### DOCROOT:
 
-* If everything works as expected, 100 will be assigned.
-* If existing pages and files are NOT handled correctly, 30 points will be docked.
-* For each of the errors not handled correctly (403, and 404), 15 points will be docked.
-* If `README.md` is not updated with your name and info, 10 points will be docked.
-* If `credentials.ini` is commited, 10 points will be docked.
-* If the repo clones, but `make install` or `make run` throws an error, 10 will be assigned.
-* If `credentials.ini` is incorrect or not submitted, 0 will be assigned.
+Initially, I began my process of implementing the "file checking" logic discussed by creating a copy of the credentials-skel.ini file into my official credential.ini file, with the added modification of my DOCROOT key-value pair to the parent directory containing the files we will be testing. This is a crucial step as this change was crucial in creating a way to check if the file path exist when communicating with the socket. 
+I also modified the `PORT` to store the specified port I was communicating with. 
+
+##### PAGESERVER:
+
+As explained above, pageserver.py is a python application that listens to a specified port and handles request. In this module, most of my work centered around the respond function which initially responded to any GET request and answered back with an answered with an ascii graphic of a cat. Listed below are the steps in chronological order that I took to gather the information to implement my solution:
+
+* Identified that our GET request was parsed into a list of strings and from there located the index upon which the inputted file  (i.e. `trivia.html`) is stored
+* In the existing conditional block which checks for any GET request, I wrote three additional conditional cases that tested the following:
+
+  1. If the `FILE EXIST`, read the contents of the file and transmit it to the local host server port. This was done using the os library method `os.path.exist` which allows us to check whether a file path exist or not. From there it was a matter of simply opening the file and transmitting it contents back to the server as well as 200 OK status using the module level argument `STATUS_OK`. 
+     
+     * Note: In order to get the correct path, DOCROOT needed to be imported. Luckily, the logic for it was already contained thanks to our main function that imported `config.py` which traced back to DOCROOT key. By using the `get.options()` helper method which returns namespace (that is, object) of configuration
+        values, I was able to import and store the value of DOCROOT which was modifeid as explained earlier. Function signatures such as `repsponse()` and `serve()` were refactored to incoperate this variable.
+  
+  2. If an `ILLEGAL CHARACTER` is inputted within the request, transmit a 403 Forbidden error using the module level argument `STATUS_FORBIDDEN` followed by a string explaining what happened.
+  3. For our `FILE NOT FOUND` case, if none of cases above occur, we transmit it as a 404 Not Found error using the module level argument `STATUS_NOT_FOUND`. Like the previous case above, a string expressing the error was created as well.
+
+Once this logic, I began testing by using the command `make start` from the Makefile in the terminal to start listening to the port on the local host socket. From there, I opened my browser and made a GET request to this specific port (i.e. `http://localhost:5000/trivia.html`) which then allowed me to see the contents of the html and css file.
+
+##### Additional notes
+* Renamed process id file `$ mv pypid, pypid` to fix side effect that prevented port connection from failing gracefully upon make command usage 
+* Typo caught and modified in `config.py`
+
+
 
 ## Authors
 
-Michal Young, Ram Durairajan.
+Fedi Aniefuna
