@@ -8,5 +8,5 @@
 #
 
 python3 pageserver/pageserver.py $* &
-echo $! >,pypid
-echo "----> If make stop doesn't work, kill using: kill -9 " `cat ,pypid`
+echo $! > pypid
+echo "----> If make stop doesn't work, kill using: kill -9 " `cat pypid`

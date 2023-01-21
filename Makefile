@@ -18,4 +18,4 @@ clean:
 	@(rm -f *.pyc; rm -rf __pycache__)
 
 veryclean:
-	@(rm -f ,pypid)
+	@(rm -f pypid)
