@@ -15,6 +15,7 @@
 
 import config    # Configure from .ini files and command line
 import logging   # Better than print statements
+import os
 logging.basicConfig(format='%(levelname)s:%(message)s',
                     level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -91,8 +92,18 @@ def respond(sock):
 
     parts = request.split()
     if len(parts) > 1 and parts[0] == "GET":
-        transmit(STATUS_OK, sock)
-        transmit(CAT, sock)
+        if '~' in parts[1] or '..' in parts[1]:
+            transmit(STATUS_FORBIDDEN, sock)
+            transmit(f"\nERROR 403 Forbidden -> Illegal character found '~' or '..' found in request: {parts[1]}\n", sock)
+        elif os.path.exists(f"{dockroot}{parts[1]}"):
+            with open(f"{dockroot}{parts[1]}", 'r') as f:
+                contents = f.read()
+            transmit(STATUS_OK, sock)
+            transmit(contents, sock)
+        else:
+            transmit(STATUS_NOT_FOUND, sock)
+            transmit(f"\nERROR 404 Not Found -> File does not exist: {parts[1]}\n", sock)
+
     else:
         log.info("Unhandled request: {}".format(request))
         transmit(STATUS_NOT_IMPLEMENTED, sock)
