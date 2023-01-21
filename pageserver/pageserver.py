@@ -43,12 +43,13 @@ def listen(portnum):
     return serversocket
 
 
-def serve(sock, func):
+def serve(sock, func, dockroot):
     """
     Respond to connections on sock.
     Args:
        sock:  A server socket, already listening on some port.
        func:  a function that takes a client socket and does something with it
+       dockroot: This arguement takes our dockroot
     Returns: nothing
     Effects:
         For each connection, func is called on a client socket connected
@@ -57,7 +58,7 @@ def serve(sock, func):
     while True:
         log.info("Attempting to accept a connection on {}".format(sock))
         (clientsocket, address) = sock.accept()
-        _thread.start_new_thread(func, (clientsocket,))
+        _thread.start_new_thread(func, (clientsocket, dockroot))
 
 
 ##
@@ -79,7 +80,7 @@ STATUS_NOT_FOUND = "HTTP/1.0 404 Not Found\n\n"
 STATUS_NOT_IMPLEMENTED = "HTTP/1.0 401 Not Implemented\n\n"
 
 
-def respond(sock):
+def respond(sock, dockroot):
     """
     This server responds only to GET requests (not PUT, POST, or UPDATE).
     Any valid GET request is answered with an ascii graphic of a cat.
@@ -152,9 +153,11 @@ def main():
     if options.DEBUG:
         log.setLevel(logging.DEBUG)
     sock = listen(port)
+    dockroot = options.DOCROOT
+
     log.info("Listening on port {}".format(port))
     log.info("Socket is {}".format(sock))
-    serve(sock, respond)
+    serve(sock, respond, dockroot)
 
 
 if __name__ == "__main__":
